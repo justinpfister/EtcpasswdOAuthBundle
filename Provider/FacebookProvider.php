@@ -10,7 +10,7 @@ use Etcpasswd\OAuthBundle\Provider\Token\FacebookToken;
 class FacebookProvider extends Provider
 {
 
-    public function createTokenResponse($clientId, $secret, $code, $redirectUrl = "")
+    public function createTokenResponse($clientId, $secret, $code, $redirectUrl = "", $service = null)
     {
         $url = 'https://graph.facebook.com/oauth/access_token'
             .'?client_id='.$clientId

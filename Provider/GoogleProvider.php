@@ -13,7 +13,7 @@ use Buzz\Message\Request,
 class GoogleProvider extends Provider
 {
 
-    public function createTokenResponse($clientId, $secret, $code, $redirectUrl = "")
+    public function createTokenResponse($clientId, $secret, $code, $redirectUrl = "", $service = null)
     {
 
         $url = 'https://www.google.com/accounts/o8/oauth2/token';
@@ -36,7 +36,7 @@ class GoogleProvider extends Provider
         }
         $expiresAt = time()+$data->expires_in;
 
-        $people = 'https://www.googleapis.com/plus/v1/people/me'
+        $people = (is_null($service))? 'https://www.googleapis.com/plus/v1/people/me' : $service
             .'?key='.$clientId
             .'&access_token='.$data->access_token;
         $request = new Request(Request::METHOD_GET, $people);
