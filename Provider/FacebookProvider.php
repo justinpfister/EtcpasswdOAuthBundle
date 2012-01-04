@@ -12,11 +12,13 @@ class FacebookProvider extends Provider
 
     public function createTokenResponse($clientId, $secret, $code, $redirectUrl = "", $service = null)
     {
-        $url = 'https://graph.facebook.com/oauth/access_token'
+       $url = 'https://graph.facebook.com/oauth/access_token'
             .'?client_id='.$clientId
             .'&redirect_uri='.$redirectUrl
             .'&client_secret='.$secret
             .'&code='.$code;
+
+        //print_r($url);
 
         parse_str($this->request($url), $result);
 
@@ -30,9 +32,17 @@ class FacebookProvider extends Provider
             .'?access_token='.$accessToken;
 
         $json = json_decode($this->request($url));
+
+        //print_r($url);
+
+        //print_r($json);
+
+        //exit;
+
+
         $expiresAt = time() + $result['expires'];
 
-        return new FacebookToken($json, $accessToken, $expiresAt);
+           return new FacebookToken($json, $accessToken, $expiresAt);
     }
 
     public function getAuthorizationUrl($clientId, $scope, $redirectUrl)

@@ -90,6 +90,9 @@ class OAuthListener extends AbstractAuthenticationListener
         $authToken = new OAuthToken(array(), $token);
         $authToken->setUser($username);
 
+        echo 'you are authenticated!';
+        exit;
+
         return $this->authenticationManager
             ->authenticate($authToken);
     }
@@ -109,6 +112,7 @@ class OAuthListener extends AbstractAuthenticationListener
         $proto = $request->isSecure() ? 'https' : 'http';
 
         $url = sprintf('%s://%s%s', $proto, $request->getHost(), $path);
+
         return urlencode($url);
     }
 }
