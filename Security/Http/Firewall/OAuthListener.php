@@ -90,9 +90,6 @@ class OAuthListener extends AbstractAuthenticationListener
         $authToken = new OAuthToken(array(), $token);
         $authToken->setUser($username);
 
-        echo 'you are authenticated!';
-        exit;
-
         return $this->authenticationManager
             ->authenticate($authToken);
     }
