@@ -7,6 +7,8 @@ use Buzz\Client\ClientInterface,
     Buzz\Message\Request,
     Buzz\Message\Response;
 
+use Symfony\Component\HttpFoundation\Session;
+
 /**
  *
  * @author   Marcel Beerta <marcel@etcpasswd.de>
@@ -14,10 +16,12 @@ use Buzz\Client\ClientInterface,
 abstract class Provider implements ProviderInterface
 {
     protected $client;
+    protected $session;
 
-    public function __construct(ClientInterface $client)
+    public function __construct(ClientInterface $client, Session $session)
     {
         $this->client = $client;
+        $this->session = $session;
     }
 
     protected function request($url, $method = null)
