@@ -13,14 +13,14 @@ use Buzz\Message\Request,
 class GoogleProvider extends Provider
 {
 
-    public function createTokenResponse($clientId, $secret, $code, $redirectUrl = "", $service = null)
+    public function createTokenResponse($clientId, $secret, $returnvalues, $redirectUrl = "", $service = null)
     {
 
         $url = 'https://www.google.com/accounts/o8/oauth2/token';
 
         $request = new Request(Request::METHOD_POST, $url);
         $request->setContent(http_build_query(array(
-            'code'          => $code,
+            'code'          => $returnvalues['code'],
             'client_id'     => $clientId,
             'client_secret' => $secret,
             'grant_type'    => 'authorization_code',
@@ -48,7 +48,7 @@ class GoogleProvider extends Provider
         return new GoogleToken($me, $data->access_token, $expiresAt);
     }
 
-    public function getAuthorizationUrl($clientId, $scope, $redirectUrl)
+    public function getAuthorizationUrl($clientId, $scope, $redirectUrl, $secret)
     {
         return 'https://accounts.google.com/o/oauth2/auth'
             .'?client_id='.$clientId

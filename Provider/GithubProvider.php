@@ -21,7 +21,7 @@ class GithubProvider extends Provider
     /**
      * {@inheritDoc}
      */
-    public function getAuthorizationUrl($clientId, $scope, $redirectUrl)
+    public function getAuthorizationUrl($clientId, $scope, $redirectUrl, $secret)
     {
         return 'https://github.com/login/oauth/authorize'
             .'?client_id='.$clientId

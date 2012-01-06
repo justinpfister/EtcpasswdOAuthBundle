@@ -15,10 +15,11 @@ interface ProviderInterface
      * @param string $client_id    Client Id
      * @param string $scope        Scope requested
      * @param string $redirect_url URL To redirect to after authorization
+     * @param string $secret       Client Secret
      *
      * @return string
      */
-    function getAuthorizationUrl($clientId, $scope, $redirectUrl);
+    function getAuthorizationUrl($clientId, $scope, $redirectUrl, $secret);
 
     /**
      * Returns an authorization token which contains data about the given user

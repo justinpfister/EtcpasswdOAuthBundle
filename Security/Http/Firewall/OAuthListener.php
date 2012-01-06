@@ -67,12 +67,16 @@ class OAuthListener extends AbstractAuthenticationListener
             return $this->createProviderRedirectResponse($request);
         }
 
-        $code = $request->get('code');
+        $returnvalues = array();
+        $returnvalues['code'] = $request->get('code');
+        $returnvalues['oauth_token'] = $request->get('oauth_token');
+        $returnvalues['oauth_verifier'] = $request->get('oauth_verifier');
+
         $token = $this->oauthProvider
             ->createTokenResponse(
                 $this->options['client_id'],
                 $this->options['client_secret'],
-                $code,
+                $returnvalues,
                 $this->assembleRedirectUrl($this->options['check_path'], $request),
                 $this->options['auth_provider_service']
         );
@@ -99,7 +103,8 @@ class OAuthListener extends AbstractAuthenticationListener
         $url = $this->oauthProvider->getAuthorizationUrl(
             $this->options['client_id'],
             $this->options['scope'],
-            $this->assembleRedirectUrl($this->options['check_path'], $request)
+            $this->assembleRedirectUrl($this->options['check_path'], $request),
+            $this->options['client_secret']
         );
         return $this->httpUtils->createRedirectResponse($request, $url);
     }

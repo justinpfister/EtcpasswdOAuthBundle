@@ -2,7 +2,7 @@
 
 namespace Etcpasswd\OAuthBundle\Provider;
 
-use Etcpasswd\OAuthBundle\Provider\Token\GoogleToken;
+use Etcpasswd\OAuthBundle\Provider\Token\YahooToken;
 
 use Buzz\Message\Request,
     Buzz\Message\Response;
@@ -13,22 +13,28 @@ use Buzz\Message\Request,
 class YahooProvider extends Provider
 {
 
-    public function createTokenResponse($clientId, $secret, $code, $redirectUrl = "", $service = null)
+    public function createTokenResponse($clientId, $secret, $returnvalues, $redirectUrl = "", $service = null)
     {
 
-        $url = 'https://www.google.com/accounts/o8/oauth2/token';
+        $url = 'https://api.login.yahoo.com/oauth/v2/get_token';
 
         $request = new Request(Request::METHOD_POST, $url);
         $request->setContent(http_build_query(array(
-            'code'          => $code,
-            'client_id'     => $clientId,
-            'client_secret' => $secret,
-            'grant_type'    => 'authorization_code',
-            'redirect_uri'  => urldecode($redirectUrl)
+            'oauth_consumer_key'     => $clientId,
+            'oauth_signature_method' => 'plaintext',
+            'oauth_nonce' => 43409803434,
+            'oauth_signature' => $secret . '&',
+            'oauth_timestamp'          => time(),
+            'oauth_verifier'        => $returnvalues['oauth_verifier'],
+            'oauth_version'    => '1.0',
+            'oauth_token'   => $returnvalues['oauth_token'],
         )));
 
         $response = new Response();
         $this->client->send($request, $response);
+
+        print_r($response);
+        exit;
 
         $data = json_decode($response->getContent());
         if (isset($data->error)) {
@@ -45,16 +51,33 @@ class YahooProvider extends Provider
         $this->client->send($request, $response);
         $me = json_decode($response->getContent());
 
-        return new GoogleToken($me, $data->access_token, $expiresAt);
+        return new YahooToken($me, $data->access_token, $expiresAt);
     }
 
-    public function getAuthorizationUrl($clientId, $scope, $redirectUrl)
+    public function getAuthorizationUrl($clientId, $scope, $redirectUrl, $secret)
     {
-        return 'https://accounts.google.com/o/oauth2/auth'
-            .'?client_id='.$clientId
-            .'&redirect_uri='.$redirectUrl
-            .'&scope='.urlencode($scope)
-            .'&response_type=code';
+
+        $url = 'https://api.login.yahoo.com/oauth/v2/get_request_token';
+
+                $request = new Request(Request::METHOD_POST, $url);
+                $request->setContent(http_build_query(array(
+                    'oauth_nonce' => 434098098,
+                    'oauth_timestamp'          => time(),
+                    'oauth_consumer_key'     => $clientId,
+                    'oauth_signature_method' => 'plaintext',
+                    'oauth_signature' => $secret . '&',
+                    'oauth_version'    => '1.0',
+                    'oauth_callback'  => urldecode($redirectUrl)
+                )));
+
+        $response = new Response();
+        $this->client->send($request, $response);
+        $data = json_decode($response->getContent());
+
+        parse_str($response->getContent(),$output);
+
+        return 'https://api.login.yahoo.com/oauth/v2/request_auth'
+            .'?oauth_token='.$output['oauth_token'];
     }
 
 }

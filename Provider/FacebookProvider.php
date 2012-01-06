@@ -10,13 +10,13 @@ use Etcpasswd\OAuthBundle\Provider\Token\FacebookToken;
 class FacebookProvider extends Provider
 {
 
-    public function createTokenResponse($clientId, $secret, $code, $redirectUrl = "", $service = null)
+    public function createTokenResponse($clientId, $secret, $returnvalues, $redirectUrl = "", $service = null)
     {
        $url = 'https://graph.facebook.com/oauth/access_token'
             .'?client_id='.$clientId
             .'&redirect_uri='.$redirectUrl
             .'&client_secret='.$secret
-            .'&code='.$code;
+            .'&code='.$returnvalues['code'];
 
         //print_r($url);
 
@@ -45,7 +45,7 @@ class FacebookProvider extends Provider
            return new FacebookToken($json, $accessToken, $expiresAt);
     }
 
-    public function getAuthorizationUrl($clientId, $scope, $redirectUrl)
+    public function getAuthorizationUrl($clientId, $scope, $redirectUrl, $secret)
     {
         return 'https://www.facebook.com/dialog/oauth'
             .'?client_id='.$clientId
