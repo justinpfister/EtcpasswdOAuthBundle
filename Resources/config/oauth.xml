@@ -51,6 +51,11 @@
             class="Etcpasswd\OAuthBundle\Provider\GoogleProvider"
             parent="etcpasswd_oauth.provider.abstract"
             public="false" />
+        <service id="etcpasswd_oauth.provider.yahoo"
+            class="Etcpasswd\OAuthBundle\Provider\YahooProvider"
+            parent="etcpasswd_oauth.provider.abstract"
+            public="false" />
+
         <!--
         <service id="etcpasswd_oauth.provider.twitter"
             class="Etcpasswd\OAuthBundle\Provider\FacebookProvider"
