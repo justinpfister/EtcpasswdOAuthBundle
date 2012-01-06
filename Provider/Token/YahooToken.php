@@ -6,7 +6,7 @@ namespace Etcpasswd\OAuthBundle\Provider\Token;
  *
  * @author   Marcel Beerta <marcel@etcpasswd.de>
  */
-class GoogleToken implements TokenResponseInterface
+class YahooToken implements TokenResponseInterface
 {
 
     private $json;

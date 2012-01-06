@@ -10,7 +10,7 @@ use Buzz\Message\Request,
  *
  * @author   Marcel Beerta <marcel@etcpasswd.de>
  */
-class GoogleProvider extends Provider
+class YahooProvider extends Provider
 {
 
     public function createTokenResponse($clientId, $secret, $code, $redirectUrl = "", $service = null)
