@@ -18,10 +18,11 @@ class YahooProvider extends Provider
     {
 
         $url = 'https://api.login.yahoo.com/oauth/v2/get_token';
+        $nonce = mt_rand();
 
         $params =  'oauth_consumer_key='. $clientId
-                . '&oauth_nonce=' . 43409803434
-                . '&oauth_signature_method=' . 'HMAC-SHA1'
+                . '&oauth_nonce=' . $nonce
+                . '&oauth_signature_method=' . 'hmac-sha1'
                 . '&oauth_timestamp='. time()
                 . '&oauth_token=' .$returnvalues['oauth_token']
                 . '&oauth_verifier=' . $returnvalues['oauth_verifier']
@@ -35,8 +36,8 @@ class YahooProvider extends Provider
             $request = new Request(Request::METHOD_POST, $url);
                     $request->setContent(http_build_query($params = array(
                         'oauth_consumer_key'     => $clientId,
-                        'oauth_nonce' => 43409803434,
-                        'oauth_signature_method' => 'HMAC-SHA1',
+                        'oauth_nonce' => $nonce,
+                        'oauth_signature_method' => 'hmac-sha1',
                         'oauth_timestamp'          => time(),
                         'oauth_token'   => $returnvalues['oauth_token'],
                         'oauth_verifier'    => $returnvalues['oauth_verifier'],
@@ -64,33 +65,43 @@ class YahooProvider extends Provider
         }
         $expiresAt = time()+$output['oauth_expires_in'];
 
-        $url = 'http://social.yahooapis.com/v1/user/' . $userguid . '/profile?format=json';
+        $url = 'http://social.yahooapis.com/v1/user/' . $userguid . '/profile';
+        $nonce = mt_rand();
+        $q = 'select * from social.profile where guid=me';
 
-        $params =  'oauth_consumer_key='. $clientId
-                . '&oauth_nonce=' . 43409803434
-                . '&oauth_signature_method=' . 'HMAC-SHA1'
-                . '&oauth_timestamp='. time()
-                . '&oauth_token=' .$output['oauth_token']
-                . '&oauth_version=' .'1.0';
+        $params =     'oauth_consumer_key=' . $clientId
+                    . '&oauth_nonce=' . $nonce
+                    . '&oauth_signature_method=' . 'HMAC-SHA1'
+                    . '&oauth_timestamp='. time()
+                    . '&oauth_token=' .$output['oauth_token']
+                    . '&oauth_version=' . '1.0';
 
         $signature_base = 'GET' . '&' . rawurlencode($url) . '&' . rawurlencode($params);
         $signature_key = rawurlencode($secret) . '&' . rawurlencode($this->session->get('yahoo.oauth_token_secret'));
         $sig = base64_encode(hash_hmac('sha1', $signature_base, $signature_key,true));
 
+        $auth_header = 'Authorization: OAuth realm="yahooapis.com"'
+                      . ',' . rawurlencode('oauth_consumer_key')      . '="'  .   rawurlencode($clientId)                       .   '"'
+                      . ',' . rawurlencode('oauth_nonce')             . '="'  .   rawurlencode($nonce)                          .   '"'
+                      . ',' . rawurlencode('oauth_signature_method')  . '="'  .   rawurlencode('HMAC-SHA1')                     .   '"'
+                      . ',' . rawurlencode('oauth_timestamp')         . '="'  .   rawurlencode(time())                          .   '"'
+                      . ',' . rawurlencode('oauth_token')             . '="'  .   rawurlencode($output['oauth_token'])          .   '"'
+                      . ',' . rawurlencode('oauth_version')           . '="'  .   rawurlencode('1.0')                           .   '"'
+                      . ',' . rawurlencode('oauth_signature')         . '="'  .   rawurlencode($sig)                            .   '"';
+
 
         $request = new Request(Request::METHOD_GET, $url);
-        $request->setHeaders(array('Authorization'=>'OAuth','realm'=>'"yahooapis.com"'));
-        $request->setContent(http_build_query(array(
-                        'oauth_consumer_key'     => $clientId,
-                        'oauth_nonce' => 43409803434,
-                        'oauth_signature_method' => 'HMAC-SHA1',
-                        'oauth_timestamp'          => time(),
-                        'oauth_token' => $output['oauth_token'],
-                        'oauth_version'    => '1.0',
-                        'oauth_signature' => $sig,
-                    )));
+        $request->setHeaders(array(
+                                   // 'Content-Type' => "application/x-www-form-urlencoded",
+                                    'Authorization'=>$auth_header,
+
+        ));
+
 
         $response = new Response();
+
+        //print_r($request);
+        //exit;
 
         $this->client->send($request, $response);
 
