@@ -71,7 +71,8 @@ class YahooProvider extends Provider
         $nonce = mt_rand();
         $q = 'select * from social.profile where guid=me';
 
-        $params =     'oauth_consumer_key=' . $clientId
+        $params =     'format=' . 'json'
+                    . '&oauth_consumer_key=' . $clientId
                     . '&oauth_nonce=' . $nonce
                     . '&oauth_signature_method=' . 'HMAC-SHA1'
                     . '&oauth_timestamp='. time()
@@ -92,7 +93,7 @@ class YahooProvider extends Provider
                       . ',' . 'oauth_signature'         . '="'  .   $sig                            .   '"';
 
 
-        $request = new Request(Request::METHOD_GET, $url);
+        $request = new Request(Request::METHOD_GET, $url . '?format=json');
         $request->setHeaders(array(
                                    // 'Content-Type' => "application/x-www-form-urlencoded",
                                     'Authorization'=>$auth_header,
@@ -108,10 +109,13 @@ class YahooProvider extends Provider
 
         $this->client->send($request, $response);
 
-        print_r($response);
-        exit;
+        //print_r($response);
+        //exit;
 
         $me = json_decode($response->getContent());
+
+        print_r($me);
+        exit;
 
         return new YahooToken($me, $data->access_token, $expiresAt);
     }
