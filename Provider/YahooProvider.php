@@ -52,26 +52,27 @@ class YahooProvider extends Provider
         parse_str($response->getContent(),$output);
 
         //echo  $returnvalues['oauth_token'];
-        print_r($output);
-        echo "<br><br>TEST!";
+        //print_r($output);
+        //echo "<br><br>TEST!";
         //exit;
 
 
-        $userguid = $output['xoauth_yahoo_guid'];
+        //$userguid = $output['xoauth_yahoo_guid'];
         $authtoken = rawurlencode($output['oauth_token']);
+        $authtokensecret = rawurlencode($output['oauth_token_secret']);
+        $auth_expires = $output['oauth_expires_in'];
 
 
         $data = json_decode($response->getContent());
         if (isset($data->error)) {
             return;
         }
-        $expiresAt = time()+$output['oauth_expires_in'];
 
-        $url = 'http://social.yahooapis.com/v1/user/' . $userguid . '/profile';
-        //$url = 'http://query.yahooapis.com/v1/yql';
+        //$url = 'http://social.yahooapis.com/v1/user/' . $userguid . '/profile';
+        $url = 'http://query.yahooapis.com/v1/yql';
 
         $nonce = mt_rand();
-        $q = 'select * from social.profile where guid=me';
+        $q = rawurlencode('select * from social.profile where guid=me');
 
         $params =     'format=' . 'json'
                     . '&oauth_consumer_key=' . $clientId
@@ -79,7 +80,8 @@ class YahooProvider extends Provider
                     . '&oauth_signature_method=' . 'HMAC-SHA1'
                     . '&oauth_timestamp='. time()
                     . '&oauth_token=' . $authtoken
-                    . '&oauth_version=' . '1.0';
+                    . '&oauth_version=' . '1.0'
+                    . '&q=' . $q;
 
         $signature_base = 'GET' . '&' . rawurlencode($url) . '&' . rawurlencode($params);
         $signature_key = rawurlencode($secret) . '&' . rawurlencode($output['oauth_token_secret']);
@@ -95,7 +97,7 @@ class YahooProvider extends Provider
                       . ',' . 'oauth_signature'         . '="'  .   $sig                            .   '"';
 
 
-        $request = new Request(Request::METHOD_GET, $url . '?format=json');
+        $request = new Request(Request::METHOD_GET, $url . '?format=json&q=' . $q);
         $request->setHeaders(array(
                                    // 'Content-Type' => "application/x-www-form-urlencoded",
                                     'Authorization'=>$auth_header,
@@ -105,8 +107,8 @@ class YahooProvider extends Provider
 
         $response = new Response();
 
-        print_r($request);
-        echo "<br/><br>";
+        //print_r($request);
+        //echo "<br/><br>";
         //exit;
 
         $this->client->send($request, $response);
@@ -116,10 +118,14 @@ class YahooProvider extends Provider
 
         $me = json_decode($response->getContent());
 
-        print_r($me);
-        exit;
+        //print_r($me);
+        //exit;
 
-        return new YahooToken($me, $data->access_token, $expiresAt);
+        $this->session->remove('yahoo.oauth_token_secret');
+        $this->session->remove('yahoo.oauth_token');
+
+
+        return new YahooToken($me, array($authtoken,$authtokensecret), $auth_expires + time());
     }
 
     public function getAuthorizationUrl($clientId, $scope, $redirectUrl, $secret)

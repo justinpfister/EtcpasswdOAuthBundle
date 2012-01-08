@@ -41,8 +41,16 @@ class YahooToken implements TokenResponseInterface
      */
     public function getUsername($field = 'displayName')
     {
-        return $this->json->$field;
-    }
+        //multiple email addresses .. find Primary!
+        if(is_array($this->json->query->results->profile->emails)) {
+         foreach( $this->json->query->results->profile->emails as $email) {
+          if($email->primary == 'true') return $email->handle;
+         }
+        }
+
+        // single email -- bring it!
+        return $this->json->query->results->profile->emails->handle;
+     }
 
     /**
      * {@inheritDoc}
@@ -59,6 +67,6 @@ class YahooToken implements TokenResponseInterface
 
     public function getProviderKey()
     {
-        return 'google';
+        return 'yahoo';
     }
 }
