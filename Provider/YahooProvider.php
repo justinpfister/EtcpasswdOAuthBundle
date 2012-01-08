@@ -81,13 +81,13 @@ class YahooProvider extends Provider
         $sig = base64_encode(hash_hmac('sha1', $signature_base, $signature_key,true));
 
         $auth_header = 'Authorization: OAuth realm="yahooapis.com"'
-                      . ',' . rawurlencode('oauth_consumer_key')      . '="'  .   rawurlencode($clientId)                       .   '"'
-                      . ',' . rawurlencode('oauth_nonce')             . '="'  .   rawurlencode($nonce)                          .   '"'
-                      . ',' . rawurlencode('oauth_signature_method')  . '="'  .   rawurlencode('HMAC-SHA1')                     .   '"'
-                      . ',' . rawurlencode('oauth_timestamp')         . '="'  .   rawurlencode(time())                          .   '"'
-                      . ',' . rawurlencode('oauth_token')             . '="'  .   rawurlencode($output['oauth_token'])          .   '"'
-                      . ',' . rawurlencode('oauth_version')           . '="'  .   rawurlencode('1.0')                           .   '"'
-                      . ',' . rawurlencode('oauth_signature')         . '="'  .   rawurlencode($sig)                            .   '"';
+                      . ',' . 'oauth_consumer_key'      . '="'  .   $clientId                       .   '"'
+                      . ',' . 'oauth_nonce'             . '="'  .   $nonce                          .   '"'
+                      . ',' . 'oauth_signature_method'  . '="'  .   'HMAC-SHA1'                     .   '"'
+                      . ',' . 'oauth_timestamp'         . '="'  .   time()                          .   '"'
+                      . ',' . 'oauth_token'             . '="'  .   $output['oauth_token']          .   '"'
+                      . ',' . 'oauth_version'           . '="'  .   '1.0'                           .   '"'
+                      . ',' . 'oauth_signature'         . '="'  .   $sig                            .   '"';
 
 
         $request = new Request(Request::METHOD_GET, $url);
