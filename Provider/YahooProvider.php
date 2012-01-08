@@ -52,11 +52,13 @@ class YahooProvider extends Provider
         parse_str($response->getContent(),$output);
 
         //echo  $returnvalues['oauth_token'];
-        //print_r($output);
+        print_r($output);
+        echo "<br><br>TEST!";
         //exit;
 
 
         $userguid = $output['xoauth_yahoo_guid'];
+        $authtoken = rawurlencode($output['oauth_token']);
 
 
         $data = json_decode($response->getContent());
@@ -73,11 +75,11 @@ class YahooProvider extends Provider
                     . '&oauth_nonce=' . $nonce
                     . '&oauth_signature_method=' . 'HMAC-SHA1'
                     . '&oauth_timestamp='. time()
-                    . '&oauth_token=' .$output['oauth_token']
+                    . '&oauth_token=' . $authtoken
                     . '&oauth_version=' . '1.0';
 
         $signature_base = 'GET' . '&' . rawurlencode($url) . '&' . rawurlencode($params);
-        $signature_key = rawurlencode($secret) . '&' . rawurlencode($this->session->get('yahoo.oauth_token_secret'));
+        $signature_key = rawurlencode($secret) . '&' . rawurlencode($output['oauth_token_secret']);
         $sig = base64_encode(hash_hmac('sha1', $signature_base, $signature_key,true));
 
         $auth_header = 'Authorization: OAuth realm="yahooapis.com"'
@@ -85,7 +87,7 @@ class YahooProvider extends Provider
                       . ',' . 'oauth_nonce'             . '="'  .   $nonce                          .   '"'
                       . ',' . 'oauth_signature_method'  . '="'  .   'HMAC-SHA1'                     .   '"'
                       . ',' . 'oauth_timestamp'         . '="'  .   time()                          .   '"'
-                      . ',' . 'oauth_token'             . '="'  .   $output['oauth_token']          .   '"'
+                      . ',' . 'oauth_token'             . '="'  .   $authtoken                      .   '"'
                       . ',' . 'oauth_version'           . '="'  .   '1.0'                           .   '"'
                       . ',' . 'oauth_signature'         . '="'  .   $sig                            .   '"';
 
@@ -100,7 +102,8 @@ class YahooProvider extends Provider
 
         $response = new Response();
 
-        //print_r($request);
+        print_r($request);
+        echo "<br/><br>";
         //exit;
 
         $this->client->send($request, $response);
@@ -121,7 +124,7 @@ class YahooProvider extends Provider
                 $request->setContent(http_build_query(array(
                     'oauth_callback'  => urldecode($redirectUrl),
                     'oauth_consumer_key'     => $clientId,
-                    'oauth_nonce' => 434098098,
+                    'oauth_nonce' => mt_rand(),
                     'oauth_signature' => $secret . '&',
                     'oauth_signature_method' => 'plaintext',
                     'oauth_timestamp'          => time(),
@@ -137,6 +140,10 @@ class YahooProvider extends Provider
         parse_str($response->getContent(),$output);
 
         $this->session->set('yahoo.oauth_token_secret',$output['oauth_token_secret']);
+        $this->session->set('yahoo.oauth_token',$output['oauth_token']);
+
+        //print_r($output);
+        //exit;
 
         return 'https://api.login.yahoo.com/oauth/v2/request_auth'
             .'?oauth_token='.$output['oauth_token'];
