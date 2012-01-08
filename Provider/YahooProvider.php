@@ -68,6 +68,8 @@ class YahooProvider extends Provider
         $expiresAt = time()+$output['oauth_expires_in'];
 
         $url = 'http://social.yahooapis.com/v1/user/' . $userguid . '/profile';
+        //$url = 'http://query.yahooapis.com/v1/yql';
+
         $nonce = mt_rand();
         $q = 'select * from social.profile where guid=me';
 
