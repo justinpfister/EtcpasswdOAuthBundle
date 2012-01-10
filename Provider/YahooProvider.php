@@ -57,7 +57,7 @@ class YahooProvider extends Provider
         //exit;
 
 
-        //$userguid = $output['xoauth_yahoo_guid'];
+        $userguid = $output['xoauth_yahoo_guid'];
         $authtoken = rawurlencode($output['oauth_token']);
         $authtokensecret = rawurlencode($output['oauth_token_secret']);
         $auth_expires = $output['oauth_expires_in'];

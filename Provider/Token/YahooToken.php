@@ -51,7 +51,7 @@ class YahooToken implements TokenResponseInterface
             {
                 return $email->handle;
             } else {
-              $lastknownemail = $email->handle;
+              if(isset($email->handle)) { $lastknownemail = $email->handle; }
           }
          }
             return $lastknownemail;
