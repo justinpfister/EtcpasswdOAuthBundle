@@ -41,11 +41,20 @@ class YahooToken implements TokenResponseInterface
      */
     public function getUsername($field = 'displayName')
     {
+        //print_r($this->json);
+        //exit;
+
         //multiple email addresses .. find Primary!
         if(is_array($this->json->query->results->profile->emails)) {
          foreach( $this->json->query->results->profile->emails as $email) {
-          if($email->primary == 'true') return $email->handle;
+          if(isset($email->primary) && $email->primary == 'true')
+            {
+                return $email->handle;
+            } else {
+              $lastknownemail = $email->handle;
+          }
          }
+            return $lastknownemail;
         }
 
         // single email -- bring it!
